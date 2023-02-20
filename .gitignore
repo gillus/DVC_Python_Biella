@@ -1,9 +1,3 @@
-.dvc/cache/35/86306448292348e0a808ca857f9f15
-.dvc/tmp/lock
-.dvc/tmp/rwlock
-.dvc/tmp/rwlock.lock
-.dvc/tmp/hashes/local/cache.db
-.dvc/tmp/links/cache.db
 model/__pycache__/__init__.cpython-310.pyc
 model/__pycache__/model_training.cpython-310.pyc
 test/__pycache__/test_data_and_model.cpython-310-pytest-7.2.1.pyc
