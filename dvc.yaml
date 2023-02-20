@@ -37,3 +37,10 @@ stages:
         cache: true
     outs:
     - prc.json
+
+plots:
+  - Precision-Recall:
+      template: simple
+      x: recall
+      y:
+        prc.json: precision
