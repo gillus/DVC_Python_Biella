@@ -1,0 +1,83 @@
+import pytest
+from sklearn.metrics import classification_report, precision_recall_curve, roc_auc_score
+from model.model_training import data_loader
+import joblib
+import numpy as np
+import math
+import json
+
+
+@pytest.fixture
+def adult_test_dataset():
+    path = './holdout.csv'
+    x, y = data_loader(path)
+    return x, y, path
+
+
+def test_dataloader(adult_test_dataset):
+    # Test whether there are columns containing unique values within the cleaned dataset or whether there are
+    x, y, _ = adult_test_dataset
+
+    # perform unique count for each column of the dataframe
+    n_unique = x.nunique(axis=0).values
+
+    # perform unique count for each CATEGORICAL column of the dataframe
+    n_unique_categorical = np.array([x[i].nunique() for i in x.columns[x.dtypes == 'object']])
+
+    # Perform tests on unique counts
+    assert n_unique.min() > 1
+    assert all(n_unique_categorical/x.shape[0] < 0.9)
+
+
+def test_model_metrics(adult_test_dataset):
+    x, y, data_path = adult_test_dataset
+    clf = joblib.load('./model.pkl')
+    predictions = clf.predict(x)
+    metrics = classification_report(y, predictions, output_dict=True)
+    # just adding a comment
+    assert len(np.unique(predictions)) > 1
+    assert metrics['>50K']['precision'] > 0.7  # fill here
+    assert metrics['>50K']['recall'] > 0.1  # fill here
+
+
+def test_model_overconfidence_fp(adult_test_dataset):
+    x, y, data_path = adult_test_dataset
+    clf = joblib.load('./model.pkl')
+    predictions = clf.predict_proba(x)
+
+    fp = np.where((clf.predict(x) != y) & (predictions.argmax(axis=1) == 1))
+
+    assert predictions[fp].shape[0] < 0.1 * predictions.shape[0]
+
+
+def test_prc(adult_test_dataset):
+    x, y, data_path = adult_test_dataset
+    clf = joblib.load('./model.pkl')
+    predictions = clf.predict_proba(x)[:, 1]
+    precision, recall, prc_thresholds = precision_recall_curve(y=='>50K', predictions)
+    nth_point = math.ceil(len(prc_thresholds) / 1000)
+    prc_points = list(zip(precision, recall, prc_thresholds))[::nth_point]
+    prc_file = "prc.json"
+    with open(prc_file, "w") as fd:
+        json.dump(
+            {
+                "prc": [
+                    {"precision": p, "recall": r, "threshold": t}
+                    for p, r, t in prc_points
+                ]
+            },
+            fd,
+            indent=4,
+        )
+        
+    rocauc = roc_auc_score(y=='>50K', predictions)
+    with open('rocauc.json', "w") as fd:
+        json.dump(
+            {
+                "rocauc": rocauc,
+            },
+            fd,
+            indent=4,
+        )
+    print('AUPR',precision, recall, predictions)
+    assert np.dot(precision, recall)/x.shape[0]>0.2
