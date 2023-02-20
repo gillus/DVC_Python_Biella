@@ -22,7 +22,7 @@ def data_loader(path: str):
     return x, y
 
 
-def train_random_forest_model():
+def train_model():
     # This function trains a random folder classifier using the data specified by datapath
     # If parameters are not specified as argument look for params.json file, otherwise create default values
     # if parameters is None:
@@ -33,8 +33,6 @@ def train_random_forest_model():
     #                           min_sample_leaf=10)
     parameters = yaml.safe_load(open("params.yaml"))["train"]
 
-
-    print(parameters)
     x_training, y_training = data_loader('./train.csv')
     x_val, y_val = data_loader('./val.csv')
 
@@ -69,4 +67,4 @@ def train_random_forest_model():
 
 if __name__ == '__main__':
 
-    train_random_forest_model()
+    train_model()
