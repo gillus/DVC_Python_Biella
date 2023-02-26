@@ -14,15 +14,10 @@ Dove s3:// rappresenta l'indirizzo del bucket da usare come remote (si da per sc
 
 L'inizializzazione crea una cartella da aggiungere al repository (contenente eventuali configurazioni remote effettuate nel passaggio precedente)
 ```sh
-git add .dvc/config .dvc/.gitignore
+git add .dvc/config .dvc/.gitignore .dvcignore
 git commit -m "prima inizializzazione DVC"
 git push
 ```
-Per aggiungere un remote (ad esempio cloud su S3) utilizzare il seguente comando
-```sh
-dvc remote add -d myremote s3://<bucket>/<key>
-```
-Dove s3:// rappresenta l'indirizzo del bucket da usare come remote (si da per scontato che le autorizzazioni siano state fornite separatamente).
 
 ## Aggiunta primo dataset
 
