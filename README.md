@@ -1,7 +1,7 @@
 # DVC_Python_Biella
 Questo repository vuole essere un tutorial sul primo setup e utilizzo del tool Data Version Control.
 
-```
+```yaml
 stages:
   prepare:
     cmd: python3 data/data_preparation.py
