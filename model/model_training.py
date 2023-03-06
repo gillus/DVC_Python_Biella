@@ -64,6 +64,7 @@ def train_model():
     # serialize model using joblib
     joblib.dump(rf_pipeline, 'model.pkl')
     json.dump(metrics, open("metrics.json", "w"))
+    print("hello world")
     return rf_pipeline
 
 
