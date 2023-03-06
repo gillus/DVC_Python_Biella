@@ -4,7 +4,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
-from lightgbm import LGBMClassifier
+#from lightgbm import LGBMClassifier
 import json
 import os
 import joblib
@@ -50,9 +50,11 @@ def train_model():
                                                 ('cat', categorical_transformer, categorical_features)])
 
     print(parameters)
-    rf_clf = LGBMClassifier(n_estimators=parameters['n_estimators'],
-                            max_depth=parameters['max_depth'],
-                            random_state=42)
+    rf_clf = RandomForestClassifier(n_estimators=parameters['n_estimators'],
+                                    max_depth=parameters['max_depth'],
+                                    min_samples_leaf=parameters['min_sample_leaf'],
+                                    criterion=parameters['criterion'],
+                                    random_state=42)
 
     rf_pipeline = Pipeline(steps=[("preprocessing", x_encoder), ("rf_model", rf_clf)])
     rf_pipeline.fit(x_training, y_training)
