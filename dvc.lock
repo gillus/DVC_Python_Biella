@@ -1,0 +1,70 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python3 data/data_preparation.py
+    deps:
+    - path: data/data_preparation.py
+      md5: 9a2657dcff0276c62ce7fc03cd2d61ac
+      size: 1125
+    - path: data/raw_data.csv
+      md5: 5cd778b3d6620ca7870466aa21f7ea36
+      size: 4454938
+    params:
+      params.yaml:
+        prepare.test_size: 0.2
+        prepare.undersampling: 0.9
+        prepare.val_size: 0.2
+    outs:
+    - path: holdout.csv
+      md5: fc914fe8889a28baf9592902d1807a0d
+      size: 918287
+    - path: train.csv
+      md5: 19fd50d871e25a49415ce8a08c9e8cde
+      size: 2645118
+    - path: val.csv
+      md5: 2682beac5efd57fc57219aef4316054c
+      size: 733800
+  train:
+    cmd: python3 model/model_training.py
+    deps:
+    - path: model/model_training.py
+      md5: 17a5a1cf2cf98cdbb5a06bfdbf152cfb
+      size: 2945
+    - path: train.csv
+      md5: 19fd50d871e25a49415ce8a08c9e8cde
+      size: 2645118
+    - path: val.csv
+      md5: 2682beac5efd57fc57219aef4316054c
+      size: 733800
+    params:
+      params.yaml:
+        train.criterion: gini
+        train.max_depth: 5
+        train.min_sample_leaf: 10
+        train.n_estimators: 100
+    outs:
+    - path: metrics.json
+      md5: f01fb31a4da6eb75c8a25f6a31031dda
+      size: 535
+    - path: model.pkl
+      md5: aba6d0d9b9bb9243e9bf71d495ce2753
+      size: 409608
+  test:
+    cmd: python3 -m pytest
+    deps:
+    - path: holdout.csv
+      md5: fc914fe8889a28baf9592902d1807a0d
+      size: 918287
+    - path: model.pkl
+      md5: aba6d0d9b9bb9243e9bf71d495ce2753
+      size: 409608
+    - path: test/test_data_and_model.py
+      md5: 1e0331b0b23cb25f49d26006a7cde542
+      size: 2682
+    outs:
+    - path: prc.json
+      md5: 1fb1b69c454d1b39494220a86ed38791
+      size: 142711
+    - path: rocauc.json
+      md5: ef03651ef9eb5dd1d28fd162e71f485e
+      size: 36
